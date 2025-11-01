@@ -13,27 +13,27 @@ export class MetricsService {
 
     constructor() {
         this.usersUsedCpuGauge = new Gauge({
-            name: 'users_used_cpu',
+            name: 'screep_users_used_cpu',
             help: 'Total number of active users by country',
             labelNames: ['userName'],
         });
         this.usersTotalCpuGauge = new Gauge({
-            name: 'users_total_cpu',
+            name: 'screep_users_total_cpu',
             help: 'Total number of active users by country',
             labelNames: ['userName'],
         });
         this.usersTotalGCLGauge = new Gauge({
-            name: 'users_GCL',
+            name: 'screep_users_GCL',
             help: 'Total number of active users by country',
             labelNames: ['userName'],
         });
         this.usersTotalRoomCountGauge = new Gauge({
-            name: 'users_total_room_count',
+            name: 'screep_users_total_room_count',
             help: 'Total number of active users by country',
             labelNames: ['userName'],
         });
         this.usersTotalMoneyGauge = new Gauge({
-            name: 'users_total_money',
+            name: 'screep_users_total_money',
             help: 'Total number of active users by country',
             labelNames: ['userName'],
         });
