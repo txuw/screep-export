@@ -1,0 +1,98 @@
+# 依赖
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+# package-lock.json 应该被提交，保留依赖版本一致性
+# yarn.lock
+# pnpm-lock.yaml
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+
+# TypeScript 编译输出
+dist/
+build/
+*.tsbuildinfo
+
+# 日志文件
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# 运行时数据
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# 覆盖率报告
+coverage/
+*.lcov
+.nyc_output/
+
+# 缓存目录
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# IDE 和编辑器
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# 操作系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# 临时文件
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+
+# 测试和调试
+.nyc_output/
+coverage/
+.vscode-test/
+
+# 构建和部署相关
+*.tar.gz
+*.zip
+*.rar
+
+# MongoDB 数据文件（如果有本地 MongoDB）
+data/
+mongodb/
+
+# PM2
+.pm2/
+
+# 其他
+*.local
+.cache
+.temp
+

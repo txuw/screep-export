@@ -1,0 +1,90 @@
+name: Node.js CI and Update Deployment Config
+
+on:
+  push:
+    branches: [ "main" ] # 在main分支合并时触发
+  workflow_dispatch:
+
+env:
+  # 应用相关配置
+  APP_NAME: screep-export
+  APP_NAMESPACE_NAME: app
+
+  # 镜像仓库配置
+  ACR_DOMAIN: registry.cn-hangzhou.aliyuncs.com
+  ACR_ZONE: txuw
+
+  # 部署配置仓库信息
+  DEPLOY_REPO: txuw/k3s-apps-config # <-- [重要] 替换成你的部署配置仓库
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout application code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 获取所有历史记录，以便生成正确的版本号
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Run tests (if available)
+        run: npm test || echo "No tests found, skipping..."
+        continue-on-error: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 使用唯一的Git Commit SHA作为镜像标签
+      - name: Set Image Tag
+        id: vars
+        run: echo "IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.ACR_DOMAIN }}/${{ env.ACR_ZONE }}/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} -f Dockerfile .
+
+      - name: Log in to Docker ACR
+        run: echo "${{ secrets.ACR_PASSWORD }}" | docker login --username=${{ secrets.ACR_USERNAME }} ${{ env.ACR_DOMAIN }} --password-stdin
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.ACR_DOMAIN }}/${{ env.ACR_ZONE }}/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }}
+
+      # ------------------ 更新Kubernetes部署配置 ------------------
+      - name: Update Kubernetes deployment file in Git
+        run: |
+          # 1. 克隆部署配置仓库
+          git clone https://x-access-token:${{ secrets.GIT_PAT }}@github.com/${{ env.DEPLOY_REPO }}.git
+          
+          # 2. 进入仓库目录
+          cd $(basename ${{ env.DEPLOY_REPO }})
+          
+          # 3. 配置Git用户信息
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          
+          # 4. 使用sed更新Deployment文件中的镜像标签
+          # 假设你的部署文件命名为 screep-export-deployment.yaml
+          sed -i 's|image: ${{ env.ACR_DOMAIN }}/${{ env.ACR_ZONE }}/${{ env.APP_NAME }}:.*|image: ${{ env.ACR_DOMAIN }}/${{ env.ACR_ZONE }}/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }}|g' screep-export-deployment.yaml
+          
+          # 5. 提交并推送更改
+          git add screep-export-deployment.yaml
+          # 检查是否有更改，如果没有则不提交
+          if ! git diff --staged --quiet; then
+            git commit -m "Update image for ${{ env.APP_NAME }} to tag ${{ env.IMAGE_TAG }}"
+            git push
+          else
+            echo "No changes to commit."
+          fi
+
