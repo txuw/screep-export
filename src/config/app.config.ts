@@ -5,7 +5,8 @@ import 'dotenv/config';
  */
 export const AppConfig = {
   PORT: parseInt(process.env.PORT as string) || 8000,
-  DB_NAME: 'screeps',
-  COLLECTION_NAME: 'users',
+    DB_NAME: 'screeps',
+    USER_COLLECTION_NAME: 'users',
+    ROOM_OBJ_COLLECTION_NAME: 'rooms.objects',
 } as const;
 

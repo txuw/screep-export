@@ -1,24 +1,24 @@
 import express, { type Router, type Request, type Response } from 'express';
 import { DataService } from '../services/data.service.js';
-import { UserService } from '../services/user.service.js';
 import { MetricsService } from '../services/metrics.service.js';
+import { RoomService } from '../services/room.service.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 
 /**
  * 用户路由
  */
-export function createUsersRoutes(
+export function createRoomsRoutes(
   dataService: DataService,
   metricsService: MetricsService,
-  userService: UserService,
+  roomService: RoomService,
 ): Router {
   const router = express.Router();
 
-  router.get('/detail', asyncHandler(async (req: Request, res: Response) => {
-    const users = await dataService.findAllUsers();
-    userService.updateActiveUsers(users);
+  router.get('/', asyncHandler(async (req: Request, res: Response) => {
+    const rooms = await dataService.findAllRooms();
+    roomService.updateActiveRooms(rooms);
     res.set('Content-Type', metricsService.getContentType());
-    res.end(await metricsService.getMetrics(userService.getRegistry()));
+    res.end(await metricsService.getMetrics(roomService.getRegistry()));
   }));
 
   return router;
