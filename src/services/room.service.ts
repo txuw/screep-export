@@ -32,14 +32,11 @@ export class RoomService {
      * 更新活跃房间指标
      * @param roomObjs
      */
-    updateActiveRooms( roomObjs : { objs:Array<any>,users:Map<string,string>  }  ): void {
+    updateActiveRooms( roomObjs:Array<any>  ): void {
         this.usersEnergyGauge.reset();
 
-        const objs = roomObjs.objs
-        const userMap = roomObjs.users
-
-        let energyObjs = objs.filter(obj => 'store' in obj && 'energy' in obj.store)
-        for (let energyCount of this.getEnergyCount(energyObjs,userMap)) {
+        let energyObjs = roomObjs.filter(obj => 'store' in obj && 'energy' in obj.store)
+        for (let energyCount of this.getEnergyCount(energyObjs)) {
             this.usersEnergyGauge
                 .labels(energyCount.userName,energyCount.room)
                 .set(energyCount.totalEnergy)
@@ -47,7 +44,7 @@ export class RoomService {
     }
 
 
-    getEnergyCount( energyObjs :any[],users:Map<string,string>){
+    getEnergyCount( energyObjs :any[]){
         // 使用对象作为临时存储
         const grouped: Record<string, {
             room: string;
@@ -57,14 +54,14 @@ export class RoomService {
 
         for (let energyObj of energyObjs) {
             const energy = energyObj.store?.energy as number || 0;
-            const userId = energyObj.user?.toString() || '';
+            const username = energyObj.user?.toString() || '';
             const roomName = energyObj.room || '';
-            const key = `${userId}_${roomName}`;
+            const key = `${username}_${roomName}`;
 
             if (!grouped[key]) {
                 grouped[key] = {
                     room: roomName,
-                    userName: users.get(userId) || '',
+                    userName: username,
                     totalEnergy: 0
                 };
             }

@@ -15,8 +15,8 @@ export function createRoomsRoutes(
   const router = express.Router();
 
   router.get('/', asyncHandler(async (req: Request, res: Response) => {
-    const rooms = await dataService.findAllRooms();
-    roomService.updateActiveRooms(rooms);
+    const roomObjs = await dataService.findAllRooms();
+    roomService.updateActiveRooms(roomObjs);
     res.set('Content-Type', metricsService.getContentType());
     res.end(await metricsService.getMetrics(roomService.getRegistry()));
   }));

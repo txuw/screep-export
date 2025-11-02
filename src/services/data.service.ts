@@ -26,7 +26,7 @@ export class DataService {
         }).toArray();
     }
 
-    async findAllRooms(): Promise<{objs:Array<any>,users:Map<string,string>  }> {
+    async findAllRooms(): Promise<Array<any>> {
         // 第一步：查询有 email 的用户的 _id
         const usersCollection = this.db.collection(AppConfig.USER_COLLECTION_NAME);
         const usersWithEmail = await usersCollection.find({
@@ -34,7 +34,7 @@ export class DataService {
                 $exists: true,
                 $nin: [null, '', undefined]
             }
-        }).project({_id: 1, userName: 1}).toArray();
+        }).project({_id: 1, username: 1}).toArray();
 
         // 提取 _id 数组
         const userIds = usersWithEmail.map(user => user._id.toString());
@@ -47,23 +47,17 @@ export class DataService {
         }
         // 第二步：如果没有任何符合条件的用户，返回空数组
         if (userIds.length === 0) {
-            return {
-                objs: [],
-                users:  userNameMap
-            };
+            return [];
         }
 
         // 第三步：使用 _id 数组查询 rooms（注意：需要 await）
-        const roomsCollection = this.db.collection(AppConfig.ROOM_OBJ_COLLECTION_NAME);
-        const rooms = await roomsCollection.find({
+        const roomObjsCollection = this.db.collection(AppConfig.ROOM_OBJ_COLLECTION_NAME);
+        const roomObjs = await roomObjsCollection.find({
             user: {$in: userIds}
         }).toArray();
-
+        roomObjs.forEach(room => {room.user = userNameMap.get(room.user) || '';});
         // 返回结果
-        return {
-            objs: rooms,
-            users: userNameMap
-        };
+        return roomObjs;
     }
 }
 
