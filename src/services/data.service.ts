@@ -42,7 +42,7 @@ export class DataService {
         const userNameMap = new Map()
         for (let document of usersWithEmail) {
             var id = document._id.toString();
-            var userName = document._id.toString();
+            var userName = document.username.toString();
             userNameMap.set(id, userName);
         }
         // 第二步：如果没有任何符合条件的用户，返回空数组
