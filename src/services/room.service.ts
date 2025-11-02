@@ -11,12 +11,14 @@ export class RoomService {
     private readonly usersCreepCostCountGauge: Gauge<string>;
     private readonly usersMineralCountGauge: Gauge<string>;
     private readonly screepTypes: Set<string>;
+    private readonly screepAllTypes: Set<string>;
     private readonly screepCostMap: Map<string, number>;
     private readonly registry: Registry;
     
     constructor() {
         this.registry = new Registry();
-        this.screepTypes = new Set(['creep','tombstone']);
+        this.screepTypes = new Set(['creep']);
+        this.screepAllTypes = new Set(['creep','tombstone']);
         // Screep 身体部件成本映射
         this.screepCostMap = new Map<string, number>([
             ['move', 50],
