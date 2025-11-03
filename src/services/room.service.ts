@@ -7,12 +7,15 @@ import {Gauge, Registry} from 'prom-client';
 export class RoomService {
     private readonly usersEnergyGauge: Gauge<string>;
     private readonly usersStructCountGauge: Gauge<string>;
+    private readonly usersStructCostGauge: Gauge<string>;
     private readonly usersCreepCountGauge: Gauge<string>;
     private readonly usersCreepCostCountGauge: Gauge<string>;
     private readonly usersMineralCountGauge: Gauge<string>;
+    private readonly roomSourceEnergyGauge: Gauge<string>;
     private readonly screepTypes: Set<string>;
     private readonly screepAllTypes: Set<string>;
     private readonly screepCostMap: Map<string, number>;
+    private readonly structConstructionCostMap: Map<string, number>;
     private readonly registry: Registry;
     
     constructor() {
@@ -30,6 +33,25 @@ export class RoomService {
             ['claim', 600],
             ['tough', 10],
         ]);
+        // 建筑成本映射（CONSTRUCTION_COST）
+        this.structConstructionCostMap = new Map<string, number>([
+            ['spawn', 15000],
+            ['extension', 3000],
+            ['road', 300],
+            ['constructedWall', 1],
+            ['rampart', 1],
+            ['link', 5000],
+            ['storage', 30000],
+            ['tower', 5000],
+            ['observer', 8000],
+            ['powerSpawn', 100000],
+            ['extractor', 5000],
+            ['lab', 50000],
+            ['terminal', 100000],
+            ['container', 5000],
+            ['nuker', 100000],
+            ['factory', 100000],
+        ]);
         this.usersEnergyGauge = new Gauge({
             name: 'screep_users_energy',
             help: 'Total number of active users energy',
@@ -39,6 +61,12 @@ export class RoomService {
         this.usersStructCountGauge = new Gauge({
             name: 'screep_users_struct_count',
             help: 'Total number of active users by StructCount',
+            labelNames: ['userName','room','type'],
+            registers: [this.registry],
+        });
+        this.usersStructCostGauge = new Gauge({
+            name: 'screep_users_struct_cost',
+            help: 'Total construction cost by user/room/type',
             labelNames: ['userName','room','type'],
             registers: [this.registry],
         });
@@ -60,6 +88,12 @@ export class RoomService {
             labelNames: ['userName','room','type'],
             registers: [this.registry],
         });
+        this.roomSourceEnergyGauge = new Gauge({
+            name: 'screep_room_source_energy_total',
+            help: 'Total remaining source energy per user and room',
+            labelNames: ['userName','room'],
+            registers: [this.registry],
+        });
 
     }
 
@@ -77,6 +111,8 @@ export class RoomService {
     updateActiveRooms( roomObjs:Array<any>  ): void {
         this.usersEnergyGauge.reset();
         this.usersStructCountGauge.reset();
+        this.usersStructCostGauge.reset();
+        this.roomSourceEnergyGauge.reset();
 
         let energyObjs = roomObjs.filter(obj => 'store' in obj && 'energy' in obj.store)
         let mineralsObjs = roomObjs.filter(obj => {
@@ -88,6 +124,7 @@ export class RoomService {
         })
         let structObjs = roomObjs.filter(obj => !this.screepTypes.has(obj.type));
         let creepObjs = roomObjs.filter(obj => this.screepTypes.has(obj.type));
+        let sourceObjs = roomObjs.filter(obj => obj.type === 'source' && typeof obj.energy === 'number');
 
         for (let energyCount of this.getEnergyCount(energyObjs)) {
             this.usersEnergyGauge
@@ -99,10 +136,20 @@ export class RoomService {
                 .labels(structObj.userName,structObj.room,structObj.structType)
                 .set(structObj.totalCount)
         }
+        for (let structCost of this.getStructCostInfo(structObjs)) {
+            this.usersStructCostGauge
+                .labels(structCost.userName,structCost.room,structCost.structType)
+                .set(structCost.totalCost)
+        }
         for (let mineralObj of this.getMineralsCount(mineralsObjs)) {
             this.usersMineralCountGauge
                 .labels(mineralObj.userName,mineralObj.room,mineralObj.mineralType)
                 .set(mineralObj.totalMineral)
+        }
+        for (let roomEnergy of this.getRoomSourceEnergy(sourceObjs)) {
+            this.roomSourceEnergyGauge
+                .labels(roomEnergy.userName,roomEnergy.room)
+                .set(roomEnergy.totalEnergy)
         }
         for (let creep of this.getCreepInfo(creepObjs)) {
             this.usersCreepCountGauge
@@ -244,6 +291,62 @@ export class RoomService {
 
             grouped[key].totalCount++;
             grouped[key].costCount += creepCost;
+        }
+
+        return Object.values(grouped)
+    }
+
+    getStructCostInfo( structObjs :any[]){
+        // 使用对象作为临时存储
+        const grouped: Record<string, {
+            room: string;
+            userName: string ;
+            structType: string;
+            totalCost: number;
+        }> = {};
+
+        for (let struct of structObjs) {
+            const type = struct.type as string || '';
+            const username = struct.user?.toString() || '';
+            const roomName = struct.room || '';
+            const key = `${username}_${roomName}_${type}`;
+            const unitCost = this.structConstructionCostMap.get(type) || 0;
+
+            if (!grouped[key]) {
+                grouped[key] = {
+                    room: roomName,
+                    userName: username,
+                    structType: type,
+                    totalCost: 0,
+                };
+            }
+
+            grouped[key].totalCost += unitCost;
+        }
+
+        return Object.values(grouped)
+    }
+
+    getRoomSourceEnergy( sourceObjs :any[]){
+        const grouped: Record<string, {
+            room: string;
+            userName: string;
+            totalEnergy: number;
+        }> = {};
+
+        for (let src of sourceObjs) {
+            const roomName = src.room || '';
+            const username = src.user?.toString() || '';
+            const key = `${username}_${roomName}`;
+            const energy = (typeof src.energy === 'number' ? src.energy : 0) as number;
+            if (!grouped[key]) {
+                grouped[key] = {
+                    room: roomName,
+                    userName: username,
+                    totalEnergy: 0,
+                };
+            }
+            grouped[key].totalEnergy += energy;
         }
 
         return Object.values(grouped)
