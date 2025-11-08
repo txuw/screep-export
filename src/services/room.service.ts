@@ -124,7 +124,7 @@ export class RoomService {
         })
         let structObjs = roomObjs.filter(obj => !this.screepTypes.has(obj.type));
         let creepObjs = roomObjs.filter(obj => this.screepTypes.has(obj.type));
-        let sourceObjs = roomObjs.filter(obj => obj.type === 'source' && typeof obj.energy === 'number');
+        let sourceObjs = roomObjs.filter(obj => obj.type === 'source');
 
         for (let energyCount of this.getEnergyCount(energyObjs)) {
             this.usersEnergyGauge
@@ -338,7 +338,7 @@ export class RoomService {
             const roomName = src.room || '';
             const username = src.user?.toString() || '';
             const key = `${username}_${roomName}`;
-            const energy = (typeof src.energy === 'number' ? src.energy : 0) as number;
+            const energy = src.store.energy as number || 0;
             if (!grouped[key]) {
                 grouped[key] = {
                     room: roomName,
