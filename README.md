@@ -2,6 +2,10 @@
 
 一个用于导出 Screep 游戏数据为 Prometheus 格式的 Node.js 应用程序。
 
+## 项目北京
+
+- [Screep 私服指标看板搭建&实施](https://blog.txuw.top/archives/screep-zhi-biao-kan-ban-shi-jian)
+
 ## 项目简介
 
 Screep Export 是一个专业的数据导出服务，从 MongoDB 数据库中提取 Screep 游戏数据，并将其转换为 Prometheus 监控系统可识别的指标格式。该系统支持用户级别和房间级别的多维度数据监控，为游戏运营提供全面的数据洞察。
