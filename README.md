@@ -1,158 +1,160 @@
 # Screep Export
 
-一个用于导出 Screep 游戏数据为 Prometheus 格式的 Node.js 应用程序。
+A Node.js application for exporting Screep game data in Prometheus format.
 
-## 项目北京
+**Languages:** [English](README.md) | [中文](README.zh.md)
 
-- [Screep 私服指标看板搭建&实施](https://blog.txuw.top/archives/screep-zhi-biao-kan-ban-shi-jian)
+## Project Background
 
-## 项目简介
+- [Screep Private Server Metrics Dashboard Implementation](https://blog.txuw.top/archives/screep-zhi-biao-kan-ban-shi-jian)
 
-Screep Export 是一个专业的数据导出服务，从 MongoDB 数据库中提取 Screep 游戏数据，并将其转换为 Prometheus 监控系统可识别的指标格式。该系统支持用户级别和房间级别的多维度数据监控，为游戏运营提供全面的数据洞察。
+## Project Introduction
 
-## 功能特性
+Screep Export is a professional data export service that extracts Screep game data from MongoDB databases and converts it into Prometheus-compatible metric formats. The system supports multi-dimensional data monitoring at both user and room levels, providing comprehensive data insights for game operations.
 
-- 🎮 **全面的数据采集**: 支持用户信息和房间对象的完整数据收集
-- 📊 **丰富的监控指标**: 提供 CPU 使用率、GCL 等级、资源存储、建筑成本等多维度指标
-- 🏷️ **灵活的标签系统**: 支持按用户名、房间、类型等维度进行数据分类
-- 💰 **成本计算**: 自动计算 Creep 和建筑的建造成本
-- 🔧 **实时数据更新**: 每次请求都获取最新的游戏数据
-- 🚀 **高性能架构**: 基于 Express.js 和 MongoDB 连接池的高性能架构
-- 📈 **Prometheus 兼容**: 完全兼容 Prometheus 监控系统
-- 🏥 **健康检查**: 内置健康检查端点，支持 Kubernetes 部署
+## Features
 
-## 技术栈
+- 🎮 **Comprehensive Data Collection**: Complete data collection for user information and room objects
+- 📊 **Rich Monitoring Metrics**: Multi-dimensional metrics including CPU usage, GCL level, resource storage, building costs
+- 🏷️ **Flexible Labeling System**: Data classification by username, room, type, and other dimensions
+- 💰 **Cost Calculation**: Automatic calculation of Creep and building construction costs
+- 🔧 **Real-time Data Updates**: Latest game data retrieved on every request
+- 🚀 **High-performance Architecture**: High-performance architecture based on Express.js and MongoDB connection pooling
+- 📈 **Prometheus Compatible**: Fully compatible with Prometheus monitoring system
+- 🏥 **Health Check**: Built-in health check endpoint supporting Kubernetes deployment
 
-- **后端框架**: Express.js 5.x
-- **数据库**: MongoDB
-- **语言**: TypeScript
-- **监控**: Prometheus + prom-client
-- **运行时**: Node.js
-- **开发工具**: tsx (开发), ts-node (构建)
+## Tech Stack
 
-## 项目结构
+- **Backend Framework**: Express.js 5.x
+- **Database**: MongoDB
+- **Language**: TypeScript
+- **Monitoring**: Prometheus + prom-client
+- **Runtime**: Node.js
+- **Development Tools**: tsx (development), ts-node (build)
+
+## Project Structure
 
 ```
 screep_export/
 ├── src/
-│   ├── config/                 # 配置文件
-│   │   ├── app.config.ts      # 应用配置
-│   │   └── database.config.ts # 数据库配置
-│   ├── database/              # 数据库服务
-│   │   └── mongodb.service.ts # MongoDB 连接管理
-│   ├── middleware/            # 中间件
-│   │   └── errorHandler.ts    # 错误处理
-│   ├── routes/               # 路由定义
-│   │   ├── index.ts         # 路由注册
-│   │   ├── home.routes.ts   # 首页路由
-│   │   ├── users.routes.ts  # 用户数据路由
-│   │   └── room.routes.ts   # 房间数据路由
-│   ├── services/            # 业务逻辑服务
-│   │   ├── data.service.ts  # 数据查询服务
-│   │   ├── metrics.service.ts # Prometheus 指标服务
-│   │   ├── user.service.ts  # 用户数据处理服务
-│   │   └── room.service.ts  # 房间数据处理服务
-│   ├── server.ts            # 服务器入口文件
-│   └── types/               # TypeScript 类型定义
-├── data_flow_diagram.md     # 数据流向图文档
-├── package.json            # 项目依赖配置
-├── tsconfig.json           # TypeScript 配置
-└── README.md              # 项目说明文档
+│   ├── config/                 # Configuration files
+│   │   ├── app.config.ts      # Application configuration
+│   │   └── database.config.ts # Database configuration
+│   ├── database/              # Database services
+│   │   └── mongodb.service.ts # MongoDB connection management
+│   ├── middleware/            # Middleware
+│   │   └── errorHandler.ts    # Error handling
+│   ├── routes/               # Route definitions
+│   │   ├── index.ts         # Route registration
+│   │   ├── home.routes.ts   # Home route
+│   │   ├── users.routes.ts  # User data route
+│   │   └── room.routes.ts   # Room data route
+│   ├── services/            # Business logic services
+│   │   ├── data.service.ts  # Data query service
+│   │   ├── metrics.service.ts # Prometheus metrics service
+│   │   ├── user.service.ts  # User data processing service
+│   │   └── room.service.ts  # Room data processing service
+│   ├── server.ts            # Server entry file
+│   └── types/               # TypeScript type definitions
+├── data_flow_diagram.md     # Data flow diagram documentation
+├── package.json            # Project dependencies configuration
+├── tsconfig.json           # TypeScript configuration
+└── README.md              # Project documentation
 ```
 
-## 快速开始
+## Quick Start
 
-### 环境要求
+### Prerequisites
 
 - Node.js 18+
 - MongoDB 4.4+
-- npm 或 yarn
+- npm or yarn
 
-### 安装依赖
+### Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 环境配置
+### Environment Configuration
 
-创建 `.env` 文件并配置以下环境变量：
+Create a `.env` file and configure the following environment variables:
 
 ```env
-# 服务器端口
+# Server port
 PORT=8000
 
-# MongoDB 连接配置
+# MongoDB connection configuration
 MONGO_URL=mongodb://localhost:27017
 ```
 
-### 数据库配置
+### Database Configuration
 
-确保 MongoDB 中有以下集合：
+Ensure MongoDB has the following collections:
 
-- `users`: 用户信息集合
-- `rooms.objects`: 房间对象集合
+- `users`: User information collection
+- `rooms.objects`: Room objects collection
 
-### 启动服务
+### Start Service
 
-#### 开发模式
+#### Development Mode
 ```bash
 npm run dev
 ```
 
-#### 生产模式
+#### Production Mode
 ```bash
-# 构建项目
+# Build project
 npm run build
 
-# 启动服务
+# Start service
 npm start
 ```
 
-服务启动后将在 `http://localhost:8000` 监听请求。
+The service will listen for requests at `http://localhost:8000` after startup.
 
-## API 接口
+## API Endpoints
 
-### 首页接口
+### Home Endpoints
 
-- `GET /` - 欢迎页面
-- `GET /health` - 健康检查（Kubernetes 兼容）
+- `GET /` - Welcome page
+- `GET /health` - Health check (Kubernetes compatible)
 
-### 用户数据接口
+### User Data Endpoints
 
-- `GET /users/detail` - 获取用户级别的 Prometheus 指标
+- `GET /users/detail` - Get user-level Prometheus metrics
 
-### 房间数据接口
+### Room Data Endpoints
 
-- `GET /room` - 获取房间级别的 Prometheus 指标
+- `GET /room` - Get room-level Prometheus metrics
 
-## 监控指标
+## Monitoring Metrics
 
-### 用户级别指标
+### User-level Metrics
 
-| 指标名称 | 标签 | 描述 |
-|---------|------|------|
-| `screep_users_used_cpu` | `userName` | 用户已使用的 CPU |
-| `screep_users_total_cpu` | `userName` | 用户总 CPU 配额 |
-| `screep_users_GCL` | `userName` | 用户 GCL 等级 |
-| `screep_users_total_room_count` | `userName` | 用户拥有的房间总数 |
-| `screep_users_total_money` | `userName` | 用户总资金 |
+| Metric Name | Labels | Description |
+|-------------|--------|-------------|
+| `screep_users_used_cpu` | `userName` | User's used CPU |
+| `screep_users_total_cpu` | `userName` | User's total CPU quota |
+| `screep_users_GCL` | `userName` | User's GCL level |
+| `screep_users_total_room_count` | `userName` | Total number of rooms owned by user |
+| `screep_users_total_money` | `userName` | User's total credits |
 
-### 房间级别指标
+### Room-level Metrics
 
-| 指标名称 | 标签 | 描述 |
-|---------|------|------|
-| `screep_users_energy` | `userName, room` | 用户在房间中的能量总量 |
-| `screep_users_struct_count` | `userName, room, type` | 用户在房间中的建筑数量（按类型） |
-| `screep_users_struct_cost` | `userName, room, type` | 用户在房间中的建筑总成本（按类型） |
-| `screep_users_creep_count` | `userName, room` | 用户在房间中的 Creep 数量 |
-| `screep_users_creep_cost_count` | `userName, room` | 用户在房间中的 Creep 总成本 |
-| `screep_users_mineral_type_count` | `userName, room, type` | 用户在房间中的矿物数量（按类型） |
-| `screep_room_source_energy_total` | `userName, room` | 用户在房间中的源点总能量 |
+| Metric Name | Labels | Description |
+|-------------|--------|-------------|
+| `screep_users_energy` | `userName, room` | Total energy in user's room |
+| `screep_users_struct_count` | `userName, room, type` | Number of structures in user's room (by type) |
+| `screep_users_struct_cost` | `userName, room, type` | Total cost of structures in user's room (by type) |
+| `screep_users_creep_count` | `userName, room` | Number of creeps in user's room |
+| `screep_users_creep_cost_count` | `userName, room` | Total cost of creeps in user's room |
+| `screep_users_mineral_type_count` | `userName, room, type` | Number of minerals in user's room (by type) |
+| `screep_room_source_energy_total` | `userName, room` | Total source energy in user's room |
 
-## 部署
+## Deployment
 
-### Docker 部署
+### Docker Deployment
 
 ```dockerfile
 FROM node:18-alpine
@@ -167,7 +169,7 @@ EXPOSE 8000
 CMD ["node", "dist/server.js"]
 ```
 
-### Kubernetes 部署
+### Kubernetes Deployment
 
 ```yaml
 apiVersion: apps/v1
@@ -224,7 +226,7 @@ spec:
   type: ClusterIP
 ```
 
-### Prometheus 配置
+### Prometheus Configuration
 
 ```yaml
 scrape_configs:
@@ -240,61 +242,61 @@ scrape_configs:
     scrape_interval: 30s
 ```
 
-## 监控示例
+## Monitoring Examples
 
-### Grafana Dashboard 查询示例
+### Grafana Dashboard Query Examples
 
 ```promql
-# 用户 CPU 使用率
+# User CPU usage percentage
 screep_users_used_cpu / screep_users_total_cpu * 100
 
-# 总 GCL 等级分布
+# Top GCL level distribution
 topk(10, screep_users_GCL)
 
-# 房间能量总量
+# Total room energy
 sum(screep_users_energy) by (userName, room)
 
-# 建筑成本排名
+# Building cost ranking
 topk(5, sum(screep_users_struct_cost) by (userName))
 
-# Creep 成本分析
+# Creep cost analysis
 sum(screep_users_creep_cost_count) by (userName, room)
 ```
 
-### 添加新指标
+### Adding New Metrics
 
-1. 在对应的 Service 类中定义新的 Gauge
-2. 实现数据收集和聚合逻辑
-3. 在更新方法中重置并设置指标值
-4. 更新文档说明
+1. Define new Gauge in corresponding Service class
+2. Implement data collection and aggregation logic
+3. Reset and set metric values in update method
+4. Update documentation
 
-### 测试
+### Testing
 
 ```bash
-# 运行测试（待实现）
+# Run tests (to be implemented)
 npm test
 
-# 代码覆盖率（待实现）
+# Code coverage (to be implemented)
 npm run test:coverage
 ```
 
-## 许可证
+## License
 
-本项目采用 ISC 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
 
-## 联系方式
+## Contact
 
-如有问题或建议，请通过以下方式联系：
+For questions or suggestions, please contact us through:
 
-- 创建 GitHub Issue
-- 发送邮件至项目维护者
+- Create a GitHub Issue
+- Send email to project maintainers
 
-## 相关文档
+## Related Documentation
 
-- [Prometheus 官方文档](https://prometheus.io/docs/)
-- [Screep 游戏文档](https://docs.screeps.com/)
-- [Express.js 官方文档](https://expressjs.com/)
+- [Prometheus Official Documentation](https://prometheus.io/docs/)
+- [Screep Game Documentation](https://docs.screeps.com/)
+- [Express.js Official Documentation](https://expressjs.com/)
 
 ---
 
-**注意**: 本项目专门为 Screep 游戏数据监控设计，请确保在使用前正确配置 MongoDB 数据库连接和数据结构。
+**Note**: This project is specifically designed for Screep game data monitoring. Please ensure MongoDB database connection and data structure are properly configured before use.
